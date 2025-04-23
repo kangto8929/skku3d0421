@@ -1,56 +1,59 @@
 using JetBrains.Annotations;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 
 public class PlayerJump : MonoBehaviour
 {
-    public float JumpForce = 7f;//점프 힘
-    public float GroundCheckDistance = 0.2f;//땅 체크 거리
-    public LayerMask GorundLayer;//땅으로 판단할 레이어
+    private CharacterController _characterController;
 
-    private Rigidbody _rigidbody;
-    private int _jumpCount = 0;//점프 횟수
-    private int _maxJumps = 2;// 최대 점프 횟수
-    private bool isGrounded;
+    public float JumpPower = 5f;
+    public float GroundCheckDistance = 1.0f;
+    public LayerMask GroundLayer;
+
+    private float _yVelocity = 0f;       // 중력가속도
+    private const float GRAVITY = -9.8f; // 중력
+
+
+    public int JumpCount = 0;
+    public bool isGrounded;
+
+   // private bool _isJumping = false;
 
     private void Start()
     {
-        _rigidbody = GetComponent<Rigidbody>();
+        _characterController = GetComponent<CharacterController>();
     }
 
     private void Update()
     {
         GroundCheck();
 
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetButtonDown("Jump") && JumpCount < 2 )
         {
-            if(isGrounded || _jumpCount< _maxJumps)
-            {
-                Jump();
-                _jumpCount++;
-                Debug.Log($"{_jumpCount}단 점프!");
-            }
+            _yVelocity = JumpPower;
+            JumpCount++;
+            Debug.Log($"{JumpCount}단 점프!");
+
         }
+
+        _yVelocity += GRAVITY * Time.deltaTime;
+        _characterController.Move(new Vector3(0, _yVelocity, 0) * Time.deltaTime);
+        
     }
+
 
     void GroundCheck()
     {
-        //아래 방햐으로 레이저 쏴서 닿았는지 확인
         Ray ray = new Ray(transform.position, Vector3.down);
-        isGrounded = Physics.Raycast(ray, GroundCheckDistance, GorundLayer);
+        isGrounded = Physics.Raycast(ray, GroundCheckDistance, GroundLayer);
 
-        if (isGrounded)
+        if(isGrounded && _yVelocity < 0)
         {
-            _jumpCount = 0; // 땅에 닿으면 점프 횟수 초기화
+            JumpCount = 0;
+            Debug.Log("착지함");
         }
-
-      //  Debug.Log("땅에 붙어있음");
     }
+    
 
-    void Jump()
-    {
-       
-        _rigidbody.linearVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z); // 수직 속도 초기화
-        _rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
-        Debug.Log("점푸");
-    }
+    
 }
