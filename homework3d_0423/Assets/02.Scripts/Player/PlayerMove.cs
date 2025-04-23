@@ -37,7 +37,7 @@ public class PlayerMove : MonoBehaviour
 
         
         // 캐릭터가 땅 위에 있다면..
-        if (_characterController.isGrounded)
+       /* if (_characterController.isGrounded)
         // = if (_characterController.collisionFlags == CollisionFlags.Below)
         //
         {
@@ -50,9 +50,29 @@ public class PlayerMove : MonoBehaviour
             _yVelocity = JumpPower;
             
             _isJumping = true;
+        }*/
+
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            //플레이어 달림
+            Steminer.Instance.DecreaseSteminer();
+           // Debug.Log("왼쪽 시프트 키 눌림, 스테미너 감소!");
         }
-        
-        
+
+        else if (Input.GetKey(KeyCode.RightShift))
+        {
+            //플레이어 달림
+            Steminer.Instance.DecreaseSteminer();
+            //Debug.Log("오른쪽 시프트 키 눌림, 스테미너 감소!");
+        }
+
+        else if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift) && !Input.GetKey(KeyCode.E))
+        {
+            //달리지 않을 경우 +  벽을 타지 않을 경우
+            Steminer.Instance.IncreaseSteminer();
+          //  Debug.Log("스테미너 회복!");
+        }
+
         // 4. 중력 적용
         _yVelocity += GRAVITY * Time.deltaTime;
         dir.y = _yVelocity;

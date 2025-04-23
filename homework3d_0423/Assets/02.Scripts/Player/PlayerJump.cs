@@ -1,26 +1,56 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class PlayerJump : MonoBehaviour
 {
+    public float JumpForce = 7f;//ì í”„ í˜
+    public float GroundCheckDistance = 0.2f;//ë•… ì²´í¬ ê±°ë¦¬
+    public LayerMask GorundLayer;//ë•…ìœ¼ë¡œ íŒë‹¨í•  ë ˆì´ì–´
+
+    private Rigidbody _rigidbody;
+    private int _jumpCount = 0;//ì í”„ íšŸìˆ˜
+    private int _maxJumps = 2;// ìµœëŒ€ ì í”„ íšŸìˆ˜
+    private bool isGrounded;
+
+    private void Start()
+    {
+        _rigidbody = GetComponent<Rigidbody>();
+    }
 
     private void Update()
     {
-        if(Input.GetKey(KeyCode.LeftShift))
+        GroundCheck();
+
+        if(Input.GetKeyDown(KeyCode.Space))
         {
-            Steminer.Instance.DecreaseSteminer();
-            Debug.Log("¿ŞÂÊ ½ÃÇÁÆ® Å° ´­¸², ½ºÅ×¹Ì³Ê °¨¼Ò!");
+            if(isGrounded || _jumpCount< _maxJumps)
+            {
+                Jump();
+                _jumpCount++;
+                Debug.Log($"{_jumpCount}ë‹¨ ì í”„!");
+            }
+        }
+    }
+
+    void GroundCheck()
+    {
+        //ì•„ë˜ ë°©í–ìœ¼ë¡œ ë ˆì´ì € ì´ì„œ ë‹¿ì•˜ëŠ”ì§€ í™•ì¸
+        Ray ray = new Ray(transform.position, Vector3.down);
+        isGrounded = Physics.Raycast(ray, GroundCheckDistance, GorundLayer);
+
+        if (isGrounded)
+        {
+            _jumpCount = 0; // ë•…ì— ë‹¿ìœ¼ë©´ ì í”„ íšŸìˆ˜ ì´ˆê¸°í™”
         }
 
-        else if(Input.GetKey(KeyCode.RightShift))
-        {
-            Steminer.Instance.DecreaseSteminer();
-            Debug.Log("¿À¸¥ÂÊ ½ÃÇÁÆ® Å° ´­¸², ½ºÅ×¹Ì³Ê °¨¼Ò!");
-        }
+      //  Debug.Log("ë•…ì— ë¶™ì–´ìˆìŒ");
+    }
 
-        else
-        {
-            Steminer.Instance.IncreaseSteminer();
-            Debug.Log("½ºÅ×¹Ì³Ê È¸º¹!");
-        }
+    void Jump()
+    {
+       
+        _rigidbody.linearVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z); // ìˆ˜ì§ ì†ë„ ì´ˆê¸°í™”
+        _rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
+        Debug.Log("ì í‘¸");
     }
 }
