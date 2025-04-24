@@ -26,4 +26,9 @@ public class Steminer : MonoBehaviour
     {
         SteminerSlider.value = SteminerSlider.value - DownSteminerSpeed * Time.deltaTime;
     }
+
+    public void DashDecreaseSteminer()
+    {
+        SteminerSlider.value = SteminerSlider.value - 0.1f;
+    }
 }
