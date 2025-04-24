@@ -6,8 +6,9 @@ public class Steminer : MonoBehaviour
     public static Steminer Instance;
 
     public Slider SteminerSlider;
-    public float UpSteminerSpeed = 0.5f;
-    public float DownSteminerSpeed = 0.05f;
+    public float UpSteminerSpeed = 0.2f;
+    public float DownSteminerSpeed = 0.4f;
+    public float DownJumpSteminerSpeed = 0.8f;
 
     private void Start()
     {
@@ -25,10 +26,14 @@ public class Steminer : MonoBehaviour
     public void DecreaseSteminer()
     {
         SteminerSlider.value = SteminerSlider.value - DownSteminerSpeed * Time.deltaTime;
+
     }
 
-    public void DashDecreaseSteminer()
+    public void DecreaseJumpSteminer()
     {
-        SteminerSlider.value = SteminerSlider.value - 0.1f;
+        SteminerSlider.value = SteminerSlider.value - DownSteminerSpeed * Time.deltaTime;
+
     }
+
+
 }

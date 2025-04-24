@@ -22,6 +22,15 @@ public class PlayerMove : MonoBehaviour
     public int JumpCount = 0;
     public bool IsGrounded;
 
+    //벽타기
+    public float WallCheckDistance;
+    public LayerMask WallLayer;
+    public bool IsOnWall;
+    private Vector3 wallNormal;
+
+    public float WallClimbSpeed = 3f;
+    private bool IsClimbingWall;
+
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
@@ -41,7 +50,7 @@ public class PlayerMove : MonoBehaviour
         {
             IsDashing = true;
             _dashTimer = DashDuration;
-            Steminer.Instance.DashDecreaseSteminer();
+            Steminer.Instance.DecreaseSteminer();
         }
 
         if (IsDashing)
@@ -56,9 +65,22 @@ public class PlayerMove : MonoBehaviour
         else if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
             Steminer.Instance.DecreaseSteminer();
-            CurrnetSpeed = RunSpeed;
+            
+
+            if(Steminer.Instance.SteminerSlider.value == 0)
+            {
+                CurrnetSpeed = MoveSpeed;
+            }
+
+            else
+            {
+                CurrnetSpeed = RunSpeed;
+            }
         }
-        else
+
+        else if(!Input.GetKey(KeyCode.J)
+            && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)
+           && !Input.GetKey(KeyCode.E) && !Input.GetButtonDown("Jump"))
         {
             Steminer.Instance.IncreaseSteminer();
             CurrnetSpeed = MoveSpeed;
@@ -66,9 +88,23 @@ public class PlayerMove : MonoBehaviour
 
         // 점프
         GroundCheck();
+        //벽 체크
+        WallCheck();
 
+        //벽 타기
+        IsClimbingWall = false;
+        if(IsOnWall && Input.GetKey(KeyCode.J) && Steminer.Instance.SteminerSlider.value > 0)
+        {
+            //스테미너가 0이 아닌 이상 벽타기 가능
+            IsClimbingWall = true;
+            Steminer.Instance.DecreaseSteminer();
+            _yVelocity = WallClimbSpeed;
+        }
+
+        //점프
         if (Input.GetButtonDown("Jump") && JumpCount < 2)
         {
+            Steminer.Instance.DecreaseSteminer();
             _yVelocity = JumpPower;
             JumpCount++;
             Debug.Log($"{JumpCount}단 점프!");
@@ -80,6 +116,7 @@ public class PlayerMove : MonoBehaviour
         _characterController.Move(dir * CurrnetSpeed * Time.deltaTime);
     }
 
+    //땅 체크
     void GroundCheck()
     {
         Ray ray = new Ray(transform.position, Vector3.down);
@@ -91,108 +128,34 @@ public class PlayerMove : MonoBehaviour
             Debug.Log("착지함");
         }
     }
+    
+    //벽 체크
+    void WallCheck()
+    {
+        RaycastHit hit;
+        Vector3[] directions =
+        {
+            transform.right,//오른쪽
+            -transform.right,//왼쪽
+            transform.forward,//앞
+            -transform.forward//뒤
+        };
+
+        IsOnWall = false;
+
+        foreach(var dir in directions)
+        {
+            if(Physics.Raycast(transform.position, dir, out hit, WallCheckDistance, WallLayer))
+            {
+                IsOnWall = true;//검사했는데 벽 있음
+                wallNormal = hit.normal;
+                Debug.DrawRay(transform.position, dir * WallCheckDistance, Color.green);
+                Debug.Log("벽있다");
+                return;
+            }
+        }
+
+
+    }
 }
 
-/*using UnityEngine;
-
-public class PlayerMove : MonoBehaviour
-{
-
-    
-
-    // - 이동속도
-    public float MoveSpeed = 7f;
-    public float RunSpeed = 12f;
-    public float CurrnetSpeed;
-
-    public float DashDuration = 5f;//대쉬하는데 걸리는 시간
-    public float _DashSpeed = 20f;
-    public bool IsDashing = false;
-    private float _dashTimer = 0f;
-
-
-    private CharacterController _characterController;
-
-    private void Awake()
-    {
-        _characterController = GetComponent<CharacterController>();
-    }
-    
-    // 구현 순서:
-    // 
-    void Update()
-    {
-        // 1. 키보드 입력을 받는다.
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-
-        // 2. 입력으로부터 방향을 설정한다.
-        Vector3 dir = new Vector3(h, 0, v);
-        dir = dir.normalized; 
-        
-        // 2-1. 메인 카메라를 기준으로 방향을 변환한다.
-        dir = Camera.main.transform.TransformDirection(dir);
-
-
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            //플레이어 달림
-            Steminer.Instance.DecreaseSteminer();
-            CurrnetSpeed = RunSpeed;
-           // Debug.Log("왼쪽 시프트 키 눌림, 스테미너 감소!");
-        }
-
-        else if (Input.GetKey(KeyCode.RightShift))
-        {
-            //플레이어 달림
-            Steminer.Instance.DecreaseSteminer();
-            CurrnetSpeed = RunSpeed;
-            //Debug.Log("오른쪽 시프트 키 눌림, 스테미너 감소!");
-        }
-
-        else if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
-        {
-            //달리지 않을 경우 +  벽을 타지 않을 경우
-            Steminer.Instance.IncreaseSteminer();
-            CurrnetSpeed = MoveSpeed;
-            //  Debug.Log("스테미너 회복!");
-        }
-
-       
-
-        else if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift) && !Input.GetKey(KeyCode.E))
-        {
-            //달리지 않을 경우 +  벽을 타지 않을 경우
-            Steminer.Instance.IncreaseSteminer();
-          //  Debug.Log("스테미너 회복!");
-        }
-
-        if (Input.GetKeyDown(KeyCode.E) && !IsDashing)
-        {
-            //앞으로 대시
-            IsDashing = true;
-            _dashTimer = DashDuration;
-            Steminer.Instance.DashDecreaseSteminer();
-        }
-
-        if (IsDashing)
-        {
-            CurrnetSpeed = _DashSpeed;
-            _dashTimer -= Time.deltaTime;
-            dir = Camera.main.transform.forward;
-            dir.y = 0f;
-            dir.Normalize();
-
-            if (_dashTimer <= 0f)
-            {
-                IsDashing = false;
-            }
-
-        }
-        
-        
-        // 4. 방향에 따라 플레이어를 이동한다.
-        //transform.position += dir * MoveSpeed * Time.deltaTime;
-        _characterController.Move(dir * CurrnetSpeed * Time.deltaTime);
-    }
-}*/
