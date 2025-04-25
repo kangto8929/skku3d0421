@@ -1,4 +1,4 @@
-/*using UnityEngine;
+using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
@@ -9,9 +9,9 @@ public class CameraFollow : MonoBehaviour
         // interpoling, smoothing 기법이 들어갈 예쩡
         transform.position = Target.position;
     }
-}*/
+}
 
-using Unity.Mathematics;
+/*using Unity.Mathematics;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
@@ -58,7 +58,7 @@ public class CameraFollow : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, _currentTarget.rotation, TransitionSpeed);
         }
     }
-}
+}*/
 
 
 
