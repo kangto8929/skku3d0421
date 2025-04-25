@@ -25,7 +25,7 @@ public class PlayerFire : MonoBehaviour
     {
         // 2. 오른쪽 버튼 입력 받기
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))//1이었음
         {
             // 3. 발사 위치에 수류탄 생성하기
             GameObject bomb = Instantiate(BombPrefab);
@@ -35,6 +35,8 @@ public class PlayerFire : MonoBehaviour
             Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
             bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
             bombRigidbody.AddTorque(Vector3.one);
+
+            //Debug.Log("수류탄 바바바");
         }
         
         // 총알 발사(레이저 방식)
@@ -55,12 +57,35 @@ public class PlayerFire : MonoBehaviour
                 BulletEffect.transform.position = hitInfo.point;
                 BulletEffect.transform.forward  = hitInfo.normal; // 법선 벡터: 직선에 대하여 수직인 벡터
                 BulletEffect.Play();
-                
+
                 // 게임 수학: 선형대수학(스칼라, 벡터, 행렬) 기하학(삼각함수 ..)
+               // IDamageable damageable = hitInfo.collider.GetComponent<IDamageable>();
+                if(hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                //if(damageable != null)
+                {
+                    Damage damage = new Damage();
+                    damage.Value = 10;
+                    damage.From = this.gameObject;
+
+                    damageable.TakeDamage(damage);
+                }
+
+
 
                 if(hitInfo.collider.gameObject.CompareTag("Enemy"))
                 {
                     Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+
+                    Damage damage = new Damage();
+                    damage.Value = 10;
+                    damage.From = this.gameObject;
+
+                    enemy.TakeDamage(damage);
+                }
+
+                else if (hitInfo.collider.gameObject.CompareTag("Drum"))
+                {
+                    Drum enemy = hitInfo.collider.GetComponent<Drum>();
 
                     Damage damage = new Damage();
                     damage.Value = 10;

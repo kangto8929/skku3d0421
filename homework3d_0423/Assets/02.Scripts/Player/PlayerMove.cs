@@ -125,7 +125,7 @@ public class PlayerMove : MonoBehaviour
         {
             JumpCount = 0;
             _yVelocity = -2f;
-            Debug.Log("착지함");
+            //Debug.Log("착지함");
         }
     }
     
