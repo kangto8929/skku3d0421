@@ -16,14 +16,15 @@ public class CameraRotate : MonoBehaviour
     {
         // 1. 마우스 입력을 받는다.(마우스의 커서의 움직임 방향)
         float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y");
+       // float mouseY = Input.GetAxis("Mouse Y");
         
         // 2. 회전한 양만큼 누적시켜 나간다. 
         _rotationX +=  mouseX * RotationSpeed * Time.deltaTime;
-        _rotationY += -mouseY * RotationSpeed * Time.deltaTime;
+       // _rotationY += -mouseY * RotationSpeed * Time.deltaTime;
         _rotationY = Mathf.Clamp(_rotationY, -90f, 90f);
         
         // 3. 회전 방향으로 회전시킨다.
         transform.eulerAngles = new Vector3(_rotationY, _rotationX, 0);
     }
+    
 }

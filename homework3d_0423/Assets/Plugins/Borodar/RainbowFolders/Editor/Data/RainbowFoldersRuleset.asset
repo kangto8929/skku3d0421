@@ -377,13 +377,13 @@ MonoBehaviour:
     Key: Assets/04.Images
     Ordinal: 30
     Priority: 0
-    IconType: 80
+    IconType: 70
     SmallIcon: {fileID: 0}
     LargeIcon: {fileID: 0}
     IsIconRecursive: 1
     BackgroundType: 0
     BackgroundTexture: {fileID: 0}
-    IsBackgroundRecursive: 0
+    IsBackgroundRecursive: 1
     IsHidden: 0
   - Type: 1
     Key: Assets/05.Models
@@ -413,23 +413,47 @@ MonoBehaviour:
     Key: Assets/07.Animations
     Ordinal: 33
     Priority: 0
-    IconType: 240
+    IconType: 100
     SmallIcon: {fileID: 0}
     LargeIcon: {fileID: 0}
     IsIconRecursive: 1
     BackgroundType: 0
     BackgroundTexture: {fileID: 0}
-    IsBackgroundRecursive: 0
+    IsBackgroundRecursive: 1
     IsHidden: 0
   - Type: 1
     Key: Assets/08.Materials
     Ordinal: 34
     Priority: 0
-    IconType: 120
+    IconType: 140
     SmallIcon: {fileID: 0}
     LargeIcon: {fileID: 0}
     IsIconRecursive: 1
     BackgroundType: 0
     BackgroundTexture: {fileID: 0}
-    IsBackgroundRecursive: 0
+    IsBackgroundRecursive: 1
+    IsHidden: 0
+  - Type: 1
+    Key: Assets/01.Scene
+    Ordinal: 35
+    Priority: 0
+    IconType: 10
+    SmallIcon: {fileID: 0}
+    LargeIcon: {fileID: 0}
+    IsIconRecursive: 0
+    BackgroundType: 0
+    BackgroundTexture: {fileID: 0}
+    IsBackgroundRecursive: 1
+    IsHidden: 0
+  - Type: 1
+    Key: Assets/07.Animation
+    Ordinal: 36
+    Priority: 0
+    IconType: 100
+    SmallIcon: {fileID: 0}
+    LargeIcon: {fileID: 0}
+    IsIconRecursive: 0
+    BackgroundType: 0
+    BackgroundTexture: {fileID: 0}
+    IsBackgroundRecursive: 1
     IsHidden: 0

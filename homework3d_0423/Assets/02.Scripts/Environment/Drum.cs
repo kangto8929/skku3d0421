@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Drum : MonoBehaviour, IDamageable
 {
+    public Slider HealthBar;
     public GameObject ExplosionEffectPrefab;
     public int Health = 20;
     public int Damage = 100;
@@ -13,6 +15,12 @@ public class Drum : MonoBehaviour, IDamageable
 
     private bool _isExploded;
 
+    void Start()
+    {
+        HealthBar.maxValue = Health;
+        HealthBar.value = Health;
+    }
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -21,7 +29,10 @@ public class Drum : MonoBehaviour, IDamageable
     public void TakeDamage(Damage damage)
     {
         Health -= damage.Value;
-        if(Health <= 0 && !_isExploded)
+
+        HealthBar.value = HealthBar.maxValue - Health;
+
+        if (Health <= 0 && !_isExploded)
         {
             Explode();
            

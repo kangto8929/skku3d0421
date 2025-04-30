@@ -13,6 +13,10 @@ public class Bomb : MonoBehaviour
     // 충돌했을 때
     private void OnCollisionEnter(Collision collision)
     {
+        GameObject otherObject = collision.gameObject;
+        Debug.Log("충돌한 오브젝트 이름: " + otherObject.name);
+
+
         GameObject effectObject = Instantiate(ExplosionEffectPrefab);
         effectObject.transform.position = transform.position;
         

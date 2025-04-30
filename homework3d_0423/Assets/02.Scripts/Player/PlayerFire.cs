@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class PlayerFire : MonoBehaviour
 {
@@ -23,78 +24,98 @@ public class PlayerFire : MonoBehaviour
     public int BombCount = 50;
     public TextMeshProUGUI BombCountText;
 
+    private Animator _animator;
+
+    public GameObject UI_Crosshair;
+    public GameObject UI_SniperZoom;
+
+    public float ZoomInSize = 15f;
+    public float ZoomOutSize = 60f;
+    private bool _zoomMode = false;
+
+
     private void Start()
     {
+        _animator = GetComponentInChildren<Animator>();
+
         Cursor.lockState = CursorLockMode.Locked;
         BombCountText.text = BombCount + " / " + MaxBombCount;
     }
+
+    private void LateUpdate()
+    {
+        FirePosition.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.5f;
+        FirePosition.transform.rotation = Camera.main.transform.rotation;
+    }
+
 
     private void Update()
     {
         // 2. 오른쪽 버튼 입력 받기
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
+        if (Input.GetMouseButtonDown(2))
+        {
+            _zoomMode = !_zoomMode;
+            if(_zoomMode)
+            {
+                UI_SniperZoom.SetActive(true);
+                UI_Crosshair.SetActive(false);
+                Camera.main.fieldOfView = ZoomInSize;
+            }
+
+            else
+            {
+                UI_SniperZoom.SetActive(false);
+                UI_Crosshair.SetActive(true);
+                Camera.main.fieldOfView = ZoomOutSize;
+            }
+
+
+        }
+
         if (Input.GetMouseButtonDown(1))
         {
             if (BombCount == 0)
             {
                 Debug.Log("폭탄 발사 못해");
-                BombCountText.text = BombCount + " / "+ MaxBombCount;
+                BombCountText.text = BombCount + " / " + MaxBombCount;
             }
 
             else
             {
+
+                _animator.SetTrigger("Attack");
                 BombCount--;
                 BombCountText.text = BombCount + " / " + MaxBombCount;
                 // 3. 발사 위치에 수류탄 생성하기
 
                 GameObject bomb = BombPoolManager.Instance.GetBomb();
-                //GameObject bomb = Instantiate(BombPrefab);
                 bomb.transform.position = FirePosition.transform.position;
+                bomb.transform.position = FirePosition.transform.position;
+                bomb.transform.rotation = FirePosition.transform.rotation;
 
-                // 4. 생성된 수류탄을 카메라 방향으로 물릭적인 힘 가하기
-                Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
-                bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
-                bombRigidbody.AddTorque(Vector3.one);
-
-                
-            }
-
-        }
-
-        // 총알 발사(레이저 방식)
-        // 1. 왼쪽 버튼 입력 받기
-        if (Input.GetMouseButtonDown(0))
-        {
-            // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
-            Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
-
-            // 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
-            RaycastHit hitInfo = new RaycastHit();
-
-            // 4. 레이를 발사한 다음,            
-            bool isHit = Physics.Raycast(ray, out hitInfo);
-            if (isHit) //데이터가 있다면(부딛혔다면
-            {
-                // 피격 이펙트 생성(표시)
-                BulletEffect.transform.position = hitInfo.point;
-                BulletEffect.transform.forward = hitInfo.normal; // 법선 벡터: 직선에 대하여 수직인 벡터
-                BulletEffect.Play();
-
-                // 게임 수학: 선형대수학(스칼라, 벡터, 행렬) 기하학(삼각함수 ..)
-                // 총알을 맞은 친구가 IDamageable 구현체라면...
-                if (hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                Collider bombCol = bomb.GetComponent<Collider>();
+                Collider playerCol = GetComponent<Collider>();
+                if(bombCol != null && playerCol != null)
                 {
-                    Damage damage = new Damage();
-                    damage.Value = 10;
-                    damage.From = this.gameObject;
-
-                    damageable.TakeDamage(damage);
+                    Physics.IgnoreCollision(bombCol, playerCol);
                 }
+
+                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+                Rigidbody bombRb = bomb.GetComponent<Rigidbody>();
+                bombRb.angularVelocity = Vector3.zero;
+
+                bombRb.AddForce(ray.direction * ThrowPower, ForceMode.Impulse);
+                bombRb.AddTorque(Vector3.one);
+                _animator.SetTrigger("FinishAttack");
+
             }
         }
-        // Ray: 레이저(시작위치, 방향)
-        // RayCast: 레이저를 발사
-        // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
+
+
+          
+
+
 
     }
 }

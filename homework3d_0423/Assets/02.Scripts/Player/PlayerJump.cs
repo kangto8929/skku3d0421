@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerJump : MonoBehaviour
 {
+
     private CharacterController _characterController;
 
     public float JumpPower = 5f;
@@ -21,7 +22,6 @@ public class PlayerJump : MonoBehaviour
 
     private void Start()
     {
-        _characterController = GetComponent<CharacterController>();
     }
 
     private void Update()
@@ -30,6 +30,8 @@ public class PlayerJump : MonoBehaviour
 
         if(Input.GetButtonDown("Jump") && JumpCount < 2 )
         {
+ 
+
             _yVelocity = JumpPower;
             JumpCount++;
             Debug.Log($"{JumpCount}단 점프!");

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
+    private GameObject player;
+
     public float MoveSpeed = 7f;
     public float RunSpeed = 12f;
     public float CurrnetSpeed;
@@ -31,19 +33,31 @@ public class PlayerMove : MonoBehaviour
     public float WallClimbSpeed = 3f;
     private bool IsClimbingWall;
 
+    private Animator _animator;
+
     private void Awake()
     {
+        _animator = GetComponentInChildren<Animator>();
         _characterController = GetComponent<CharacterController>();
     }
 
     void Update()
     {
         // 입력
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-        Vector3 dir = new Vector3(h, 0, v).normalized;
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+
+
+        Vector3 dir = new Vector3(h, 0, v);
+        //_animator.SetLayerWeight(2, weight: player.Health / player.MaxHealth);
+        _animator.SetFloat(name: "MoveAmount", dir.magnitude);
+        dir = dir.normalized;
+        //여기에 노멀라이즈 해야 함
+
         dir = Camera.main.transform.TransformDirection(dir);
         dir.y = 0f;
+
+       
 
         // 대시
         if (Input.GetKeyDown(KeyCode.E) && !IsDashing)

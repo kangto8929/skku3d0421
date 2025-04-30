@@ -21,6 +21,8 @@ public class Enemy : MonoBehaviour, IDamageable
         Die
     }
 
+
+
     // 2. 현재 상태를 지정한다.
     public EnemyState CurrentState = EnemyState.Idle;
 
@@ -28,6 +30,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private CharacterController _characterController; // 캐릭터 컨트롤러
     private NavMeshAgent _agent;                      // 네비메시 에이전트
     private Vector3 _startPosition;                   // 시작 위치
+    private Animator _animator;
 
     public float FindDistance = 5f;     // 플레이어 발견 범위
     public float ReturnDistance = 5f;     // 적 복귀 범위
@@ -46,6 +49,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         _startPosition = transform.position;
         _characterController = GetComponent<CharacterController>();
+        _animator = GetComponentInChildren<Animator>();
         _player = GameObject.FindGameObjectWithTag("Player");
     }
 
@@ -96,6 +100,7 @@ public class Enemy : MonoBehaviour, IDamageable
             CurrentState = EnemyState.Die;
             Debug.Log($"상태전환: {CurrentState} -> Die");
             CurrentState = EnemyState.Die;
+            _animator.SetTrigger("Die");
             StartCoroutine(Die_Coroutine());
             return;
         }
@@ -103,6 +108,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         Debug.Log($"상태전환: {CurrentState} -> Damaged");
 
+        _animator.SetTrigger("Hit");
         CurrentState = EnemyState.Damaged;
         StartCoroutine(Damaged_Coroutine());
     }
@@ -119,6 +125,7 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             Debug.Log("상태전환: Idle -> Trace");
             CurrentState = EnemyState.Trace;
+            _animator.SetTrigger("Idle");
         }
     }
 
@@ -128,6 +135,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _player.transform.position) > ReturnDistance)
         {
             Debug.Log("상태전환: Trace -> Return");
+            _animator.SetTrigger("Idle");
             CurrentState = EnemyState.Return;
             return;
         }
@@ -136,6 +144,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _player.transform.position) < AttackDistance)
         {
             Debug.Log("상태전환: Trace -> Attack");
+            _animator.SetTrigger("MoveToAttackDelay");
             CurrentState = EnemyState.Attack;
             return;
         }
@@ -154,6 +163,7 @@ public class Enemy : MonoBehaviour, IDamageable
             Debug.Log("상태전환: Return -> Idle");
             transform.position = _startPosition;
             CurrentState = EnemyState.Idle;
+            _animator.SetTrigger("Idle");
             return;
         }
 
@@ -161,6 +171,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _player.transform.position) < FindDistance)
         {
             Debug.Log("상태전환: Return -> Trace");
+            _animator.SetTrigger("Trace");
             CurrentState = EnemyState.Trace;
         }
 
@@ -171,7 +182,7 @@ public class Enemy : MonoBehaviour, IDamageable
         _agent.SetDestination(_startPosition);
     }
 
-    private void Attack()
+    public void Attack()
     {
         // 전이: 공격 범위 보다 멀어지면 -> Trace
         if (Vector3.Distance(transform.position, _player.transform.position) >= AttackDistance)
@@ -179,6 +190,7 @@ public class Enemy : MonoBehaviour, IDamageable
             Debug.Log("상태전환: Attack -> Trace");
             CurrentState = EnemyState.Trace;
             _attackTimer = 0f;
+            _animator.SetTrigger("Trace");
             return;
         }
 
@@ -186,7 +198,8 @@ public class Enemy : MonoBehaviour, IDamageable
         _attackTimer += Time.deltaTime;
         if (_attackTimer >= AttackCooltime)
         {
-            Debug.Log("플레이어 공격!");
+            _animator.SetTrigger("AttackDelayToAttack");
+
             _attackTimer = 0f;
         }
     }
