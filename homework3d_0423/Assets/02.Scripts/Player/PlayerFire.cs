@@ -39,7 +39,7 @@ public class PlayerFire : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
 
         Cursor.lockState = CursorLockMode.Locked;
-        BombCountText.text = BombCount + " / " + MaxBombCount;
+        BombCountText.text = BombCount + "/" + MaxBombCount;
     }
 
     private void LateUpdate()
@@ -78,7 +78,7 @@ public class PlayerFire : MonoBehaviour
             if (BombCount == 0)
             {
                 Debug.Log("폭탄 발사 못해");
-                BombCountText.text = BombCount + " / " + MaxBombCount;
+                BombCountText.text = BombCount + "/" + MaxBombCount;
             }
 
             else
@@ -86,7 +86,7 @@ public class PlayerFire : MonoBehaviour
 
                 _animator.SetTrigger("Attack");
                 BombCount--;
-                BombCountText.text = BombCount + " / " + MaxBombCount;
+                BombCountText.text = BombCount + "/" + MaxBombCount;
                 // 3. 발사 위치에 수류탄 생성하기
 
                 GameObject bomb = BombPoolManager.Instance.GetBomb();

@@ -8,7 +8,7 @@ public class EnemyHealthBar : MonoBehaviour
     public Vector3 Offset = new Vector3(0, 2.0f, 0);//적 위에 띄우는 높이
 
 
-    private void Update()
+    private void LateUpdate()
     {
         Vector3 worldPosition = EnemyObject.transform.position + Offset;
         //Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);

@@ -17,9 +17,21 @@ public class Bomb : MonoBehaviour
         Debug.Log("충돌한 오브젝트 이름: " + otherObject.name);
 
 
+        //적 스크립트 있는지 확인
+        var damage = GetComponent<Damage>();
+        var target = otherObject.GetComponent<Enemy>();
+        if(target != null && damage != null)
+        {
+            target.TakeDamage(damage);
+        }
+
         GameObject effectObject = Instantiate(ExplosionEffectPrefab);
         effectObject.transform.position = transform.position;
         
         Destroy(gameObject);
+
+       
     }
+
+
 }

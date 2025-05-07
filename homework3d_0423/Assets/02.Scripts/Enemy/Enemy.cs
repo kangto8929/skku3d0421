@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 
 // 인공지능: 사랑처럼 똑똑하게 행동하는 알고리즘
@@ -21,7 +22,10 @@ public class Enemy : MonoBehaviour, IDamageable
         Die
     }
 
+    public event Action OnDie;
 
+    public GameObject HPbar;
+    private Slider _hpbar;
 
     // 2. 현재 상태를 지정한다.
     public EnemyState CurrentState = EnemyState.Idle;
@@ -42,15 +46,33 @@ public class Enemy : MonoBehaviour, IDamageable
     public float DamagedTime = 0.5f;   // 경직 시간
     public float DeathTime = 1f;
 
+    void Awake()
+    {
+        _player = GameObject.FindGameObjectWithTag("Player");
+        if (_player == null)
+        {
+            Debug.LogError("플레이어 안 보임");
+        }
+        else
+        {
+            Debug.Log("플레이어 찾았다: " + _player.name);
+        }
+    }
+
     private void Start()
     {
+        _hpbar = HPbar.GetComponent<Slider>();
+
+        _hpbar.maxValue = Health;
+        _hpbar.value = Health;
+
         _agent = GetComponent<NavMeshAgent>();
         _agent.speed = MoveSpeed;
 
         _startPosition = transform.position;
         _characterController = GetComponent<CharacterController>();
         _animator = GetComponentInChildren<Animator>();
-        _player = GameObject.FindGameObjectWithTag("Player");
+       
     }
 
 
@@ -85,6 +107,16 @@ public class Enemy : MonoBehaviour, IDamageable
         }
     }
 
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Damage damage = other.GetComponent<Damage>();
+        if(damage != null)
+        {
+            TakeDamage(damage);
+        }
+    }
+
     public void TakeDamage(Damage damage)
     {
         // 사망했거나 공격받고 있는 중이면..
@@ -94,6 +126,9 @@ public class Enemy : MonoBehaviour, IDamageable
         }
 
         Health -= damage.Value;
+        _hpbar.value = Health;
+
+        Debug.Log("공격당했어요");
 
         if (Health <= 0)
         {
@@ -102,6 +137,9 @@ public class Enemy : MonoBehaviour, IDamageable
             CurrentState = EnemyState.Die;
             _animator.SetTrigger("Die");
             StartCoroutine(Die_Coroutine());
+
+            //이벤트 호출
+            OnDie?.Invoke();
             return;
         }
 
@@ -125,7 +163,7 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             Debug.Log("상태전환: Idle -> Trace");
             CurrentState = EnemyState.Trace;
-            _animator.SetTrigger("Idle");
+            _animator.SetTrigger("Trace");
         }
     }
 
@@ -135,7 +173,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _player.transform.position) > ReturnDistance)
         {
             Debug.Log("상태전환: Trace -> Return");
-            _animator.SetTrigger("Idle");
+            _animator.SetTrigger("Trace");
             CurrentState = EnemyState.Return;
             return;
         }
@@ -144,7 +182,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _player.transform.position) < AttackDistance)
         {
             Debug.Log("상태전환: Trace -> Attack");
-            _animator.SetTrigger("MoveToAttackDelay");
+            _animator.SetTrigger("Attack");
             CurrentState = EnemyState.Attack;
             return;
         }
@@ -161,9 +199,10 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _startPosition) <= _characterController.minMoveDistance)
         {
             Debug.Log("상태전환: Return -> Idle");
+            _animator.SetTrigger("Idle");
             transform.position = _startPosition;
             CurrentState = EnemyState.Idle;
-            _animator.SetTrigger("Idle");
+            
             return;
         }
 
@@ -188,9 +227,10 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _player.transform.position) >= AttackDistance)
         {
             Debug.Log("상태전환: Attack -> Trace");
+            _animator.SetTrigger("Trace");
             CurrentState = EnemyState.Trace;
             _attackTimer = 0f;
-            _animator.SetTrigger("Trace");
+           
             return;
         }
 
@@ -198,7 +238,7 @@ public class Enemy : MonoBehaviour, IDamageable
         _attackTimer += Time.deltaTime;
         if (_attackTimer >= AttackCooltime)
         {
-            _animator.SetTrigger("AttackDelayToAttack");
+            _animator.SetTrigger("Attack");
 
             _attackTimer = 0f;
         }
@@ -220,12 +260,40 @@ public class Enemy : MonoBehaviour, IDamageable
         _agent.ResetPath();
         yield return new WaitForSeconds(DamagedTime);
         Debug.Log("상태전환: Damaged -> Trace");
+        _animator.SetTrigger("Trace");
         CurrentState = EnemyState.Trace;
     }
 
     private IEnumerator Die_Coroutine()
     {
         yield return new WaitForSeconds(DeathTime);
+
+        Debug.Log("죽었어으아으아.");
+
+        /*if (HPbar != null)
+        {
+            HPbar.SetActive(false);
+            Debug.Log("죽었어.");
+        }*/
+
+        HPbar.SetActive(false);
+        Debug.Log("죽었어.");
+
+        Health = 100;
+        _hpbar.value = Health;
+        Debug.Log("체력 100으로 회복!.");
+       
+        /*if (_hpbar != null)
+        {
+            Health = 100;
+            _hpbar.value = Health;
+            Debug.Log("체력 100으로 회복!.");
+        }*/
+
         gameObject.SetActive(false);
+        //오브젝트 풀에 되돌리기
+
+        EnemyManager.Instance.OnEnemyDie(gameObject, HPbar.GetComponent<EnemyHealthBar>());
+       
     }
 }
