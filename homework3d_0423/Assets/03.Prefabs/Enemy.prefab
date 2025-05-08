@@ -128,6 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2ac5d218f39ba646bde68fc72a6a6e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CoinPrefab: {fileID: 5495627794864089671, guid: 35a16ef2c7a72474996414daa7c46b15, type: 3}
   HPbar: {fileID: 4896650543144582551, guid: cbd053846e5be6f4b965dd1fee15faee, type: 3}
   CurrentState: 0
   FindDistance: 20
@@ -138,6 +139,7 @@ MonoBehaviour:
   Health: 100
   DamagedTime: 0.5
   DeathTime: 1
+  Damage: 20
 --- !u!195 &2741394784771933716
 NavMeshAgent:
   m_ObjectHideFlags: 0

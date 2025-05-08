@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
+    public static PlayerMove Instance;
+
     private GameObject player;
 
     public float MoveSpeed = 7f;
@@ -33,12 +35,16 @@ public class PlayerMove : MonoBehaviour
     public float WallClimbSpeed = 3f;
     private bool IsClimbingWall;
 
-    private Animator _animator;
+    public Animator Animator;
 
     private void Awake()
     {
-        _animator = GetComponentInChildren<Animator>();
         _characterController = GetComponent<CharacterController>();
+    }
+
+    private void Start()
+    {
+        Instance = this;
     }
 
     void Update()
@@ -50,7 +56,7 @@ public class PlayerMove : MonoBehaviour
 
         Vector3 dir = new Vector3(h, 0, v);
         //_animator.SetLayerWeight(2, weight: player.Health / player.MaxHealth);
-        _animator.SetFloat(name: "MoveAmount", dir.magnitude);
+        Animator.SetFloat(name: "MoveAmount", dir.magnitude);
         dir = dir.normalized;
         //여기에 노멀라이즈 해야 함
 
@@ -170,6 +176,15 @@ public class PlayerMove : MonoBehaviour
         }
 
 
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Coin"))
+        {
+            Destroy(other.gameObject);
+            Debug.Log("코인 충돌 감지됨!");
+        }
     }
 }
 

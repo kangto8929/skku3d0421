@@ -6,28 +6,46 @@ public class PlayerState : MonoBehaviour
 {
     public static PlayerState Instance;
 
+    public Slider HealthSlider;
+
     public GameObject BloodImage;//화면에 피
-    public int PlayerHealth = 150;
+    public int PlayerHealth = 750;
 
     public bool IsAttacked = false;//공격 당했는지
+
+    public bool IsDead = false;
 
     private void Start()
     {
         Instance = this;
+
+        HealthSlider.maxValue = PlayerHealth;
+        HealthSlider.value = PlayerHealth;
     }
 
     public void Attacked()
     {
-       
+        
 
         Image bloodImage = BloodImage.GetComponent<Image>();
 
         if (IsAttacked == true)
         {
-            StartCoroutine(BloodShow());
+            if (HealthSlider.value <= 0 && IsDead == false)
+            {
+                PlayerMove.Instance.Animator.SetTrigger("Die");
+                IsDead = true;
+            }
+
+            else
+            {
+                PlayerMove.Instance.Animator.SetTrigger("GetHIt");
+            }
+
+                StartCoroutine(BloodShow());
             IEnumerator BloodShow()
             {
-                //BloodImage.gameObject.SetActive(true);
+                BloodImage.gameObject.SetActive(true);
                 Color color = bloodImage.color;
 
                 while (color.a < 1f)
@@ -48,8 +66,10 @@ public class PlayerState : MonoBehaviour
 
                 bloodImage.color = color;
 
-                // BloodImage.gameObject.SetActive(false);
+                 BloodImage.gameObject.SetActive(false);
             }
+
+            
         }
 
         else
@@ -57,43 +77,7 @@ public class PlayerState : MonoBehaviour
             return;
         }
 
-           
 
-        /*if (IsAttacked == true)
-        {
-            //만약에 공격당했다면
-            StartCoroutine(BloodShow());
-            IEnumerator BloodShow()
-            {
-                BloodImage.gameObject.SetActive(true);
-                Color color = bloodImage.color;
-
-                while(color.a < 1f)
-                {
-                    color.a += Time.deltaTime / 1.5f;
-                    bloodImage.color = color;
-                    yield return null;
-                }
-
-                yield return new WaitForSeconds(1.5f);
-                color.a = 0;
-
-                bloodImage.color = color;
-
-                BloodImage.gameObject.SetActive(false);
-            }
-
-
-
-            IsAttacked = false;
-        }
-
-        else
-        {
-            //공격당하지 않았다면
-            IsAttacked = false;
-            BloodImage.gameObject.SetActive(false);
-        }*/
     }
 
 

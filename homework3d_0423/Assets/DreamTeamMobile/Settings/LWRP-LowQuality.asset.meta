@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 745a241693ed8bf44812ef824b2d56e2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 176085
+  packageName: LWRP Vertical Fog
+  packageVersion: 1.0
+  assetPath: Assets/DreamTeamMobile/Settings/LWRP-LowQuality.asset
+  uploadId: 385281

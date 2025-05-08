@@ -22,6 +22,10 @@ public class Enemy : MonoBehaviour, IDamageable
         Die
     }
 
+
+    //코인
+    public GameObject CoinPrefab;
+
     public event Action OnDie;
 
     public GameObject HPbar;
@@ -45,6 +49,8 @@ public class Enemy : MonoBehaviour, IDamageable
     public int Health = 100;
     public float DamagedTime = 0.5f;   // 경직 시간
     public float DeathTime = 1f;
+
+    public int Damage = 20;
 
     void Awake()
     {
@@ -184,6 +190,12 @@ public class Enemy : MonoBehaviour, IDamageable
             Debug.Log("상태전환: Trace -> Attack");
             _animator.SetTrigger("Attack");
             CurrentState = EnemyState.Attack;
+
+            PlayerState.Instance.Attacked();
+            PlayerState.Instance.IsAttacked = true;
+
+            PlayerState.Instance.HealthSlider.value -= Damage;
+
             return;
         }
 
@@ -240,6 +252,10 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             _animator.SetTrigger("Attack");
 
+            PlayerState.Instance.Attacked();
+            PlayerState.Instance.IsAttacked = true;
+            PlayerState.Instance.HealthSlider.value -= Damage;
+
             _attackTimer = 0f;
         }
     }
@@ -270,25 +286,19 @@ public class Enemy : MonoBehaviour, IDamageable
 
         Debug.Log("죽었어으아으아.");
 
-        /*if (HPbar != null)
-        {
-            HPbar.SetActive(false);
-            Debug.Log("죽었어.");
-        }*/
 
         HPbar.SetActive(false);
         Debug.Log("죽었어.");
+
+
+        //코인 생성
+        Vector3 spawnPosition = transform.position + new Vector3(0, 4f, 0);
+        Instantiate(CoinPrefab, spawnPosition, Quaternion.identity);
 
         Health = 100;
         _hpbar.value = Health;
         Debug.Log("체력 100으로 회복!.");
        
-        /*if (_hpbar != null)
-        {
-            Health = 100;
-            _hpbar.value = Health;
-            Debug.Log("체력 100으로 회복!.");
-        }*/
 
         gameObject.SetActive(false);
         //오브젝트 풀에 되돌리기
