@@ -20,4 +20,6 @@ public class UI_Popup : MonoBehaviour
 
         gameObject.SetActive(false);
     }
+
+   
 }

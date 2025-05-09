@@ -38,7 +38,7 @@ public class PlayerFire : MonoBehaviour
     {
         _animator = GetComponentInChildren<Animator>();
 
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
         BombCountText.text = BombCount + "/" + MaxBombCount;
     }
 

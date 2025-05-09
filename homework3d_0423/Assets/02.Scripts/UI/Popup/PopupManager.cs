@@ -12,7 +12,7 @@ public enum EPopupType
 public class PopupManager : MonoBehaviour
 {
     public static PopupManager Instance;
-
+    public UI_ReadyGo UIReadyGo;
 
     [Header("팝업 UI 참조")]
     public List<UI_Popup> Popups; // 모든 팝업을 관리하는데
@@ -45,29 +45,35 @@ public class PopupManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && UIReadyGo.ReadyGoPanel.activeSelf == false)
         {
-            if (_openedPopups.Count > 0)
-            {
+            ClosePopUp();
+        }
+    }
 
-                while(true)
+
+    public void ClosePopUp()
+    {
+        if (_openedPopups.Count > 0)
+        {
+
+            while (true)
+            {
+                bool opend = _openedPopups[_openedPopups.Count - 1].isActiveAndEnabled;
+                _openedPopups[_openedPopups.Count - 1].Close();
+                _openedPopups.RemoveAt(_openedPopups.Count - 1);
+
+                if (opend || _openedPopups.Count == 0)
                 {
-                    bool opend = _openedPopups[_openedPopups.Count - 1].isActiveAndEnabled;
-                    _openedPopups[_openedPopups.Count - 1].Close();
-                    _openedPopups.RemoveAt(_openedPopups.Count - 1);
-
-                    if(opend || _openedPopups.Count == 0)
-                    {
-                        return;
-                    }
+                    return;
                 }
-                
             }
-            else
-            {
 
-                GameManager.Instance.Pause();
-            }
+        }
+        else
+        {
+
+            GameManager.Instance.Pause();
         }
     }
 }

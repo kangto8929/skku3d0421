@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     public EGameState GameState => _gameState;
 
 
+
+
     private void Awake()
     {
         // 게임 오브젝트가 삭제될 경우 게임 오브젝트의 참조는 잃지만
@@ -52,15 +54,24 @@ public class GameManager : MonoBehaviour
         _gameState = EGameState.Run;
         Time.timeScale = 1;
 
-        Cursor.lockState = CursorLockMode.Locked;
+       // Cursor.lockState = CursorLockMode.Locked;
     }
+
+    public void TimePause()
+    {
+        _gameState = EGameState.Pause;
+        Time.timeScale = 0;
+
+        Cursor.lockState = CursorLockMode.None;
+    }
+
 
     public void Restart()
     {
         _gameState = EGameState.Run;
         Time.timeScale = 1;
 
-        Cursor.lockState = CursorLockMode.Locked;
+       // Cursor.lockState = CursorLockMode.Locked;
 
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);

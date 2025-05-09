@@ -125,9 +125,12 @@ public class PlayerMove : MonoBehaviour
         if (Input.GetButtonDown("Jump") && JumpCount < 2)
         {
             Steminer.Instance.DecreaseSteminer();
+            Animator.SetTrigger("IsJumping");
             _yVelocity = JumpPower;
             JumpCount++;
             Debug.Log($"{JumpCount}단 점프!");
+
+           
         }
 
         _yVelocity += GRAVITY * Time.deltaTime;
@@ -145,7 +148,15 @@ public class PlayerMove : MonoBehaviour
         {
             JumpCount = 0;
             _yVelocity = -2f;
-            //Debug.Log("착지함");
+            Debug.Log("착지함");
+
+            AnimatorStateInfo animationInfo = Animator.GetCurrentAnimatorStateInfo(0);
+            if (animationInfo.IsName("JumpAir"))
+            {
+                Animator.SetTrigger("IsGrdounded");
+                Debug.Log("점프 착지하는 애니메이션");
+            }
+            
         }
     }
     
