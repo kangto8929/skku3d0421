@@ -23,6 +23,9 @@ public class PlayerState : MonoBehaviour
         HealthSlider.value = PlayerHealth;
     }
 
+
+ 
+
     public void Attacked()
     {
         
@@ -31,15 +34,27 @@ public class PlayerState : MonoBehaviour
 
         if (IsAttacked == true)
         {
+            Debug.Log("아야아야");
+
             if (HealthSlider.value <= 0 && IsDead == false)
             {
                 PlayerMove.Instance.Animator.SetTrigger("Die");
                 IsDead = true;
+
+                StartCoroutine(GameOver());
+                IEnumerator GameOver()
+                {
+                    yield return new WaitForSeconds(1.5f);
+                    GameManager.Instance.TimePause();
+                    PopupManager.Instance.GameOverPanel.SetActive(true);
+                }
+                
             }
 
             else
             {
                 PlayerMove.Instance.Animator.SetTrigger("GetHIt");
+                Debug.Log("맞았어");
             }
 
                 StartCoroutine(BloodShow());

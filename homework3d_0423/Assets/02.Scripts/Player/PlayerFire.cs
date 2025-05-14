@@ -33,6 +33,7 @@ public class PlayerFire : MonoBehaviour
     public float ZoomOutSize = 60f;
     private bool _zoomMode = false;
 
+    private float _holdTime = 0f;//마우스 오른쪽 버튼을 누르고 있는 시간
 
     private void Start()
     {
@@ -51,6 +52,62 @@ public class PlayerFire : MonoBehaviour
 
     private void Update()
     {
+
+        //오른쪽 버튼 입력 받기
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (BombCount == 0)
+            {
+                Debug.Log("폭탄 발사 못해");
+                BombCountText.text = BombCount + "/" + MaxBombCount;
+            }
+
+            else
+            {
+                //마우스 오른쪽 버튼을 누르고 있으면 던지는 힘이 점차 증가
+                _holdTime += Time.deltaTime;
+
+            }
+        }
+
+        if(Input.GetMouseButton(1))
+        {
+            _holdTime = 0f;//초기화
+        }
+
+        if(Input.GetMouseButtonUp(1))
+        {
+            if(BombCount > 0)
+            {
+                _animator.SetTrigger("Attack");
+                BombCount--;
+                BombCountText.text = BombCount + "/" + MaxBombCount;
+                // 3. 발사 위치에 수류탄 생성하기
+
+                GameObject bomb = BombPoolManager.Instance.GetBomb();
+                bomb.transform.position = FirePosition.transform.position;
+                bomb.transform.position = FirePosition.transform.position;
+                bomb.transform.rotation = FirePosition.transform.rotation;
+
+                Collider bombCol = bomb.GetComponent<Collider>();
+                Collider playerCol = GetComponent<Collider>();
+                if (bombCol != null && playerCol != null)
+                {
+                    Physics.IgnoreCollision(bombCol, playerCol);
+                }
+
+                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+                Rigidbody bombRb = bomb.GetComponent<Rigidbody>();
+                bombRb.angularVelocity = Vector3.zero;
+
+                bombRb.AddForce(ray.direction * ThrowPower, ForceMode.Impulse);
+                bombRb.AddTorque(Vector3.one);
+                _animator.SetTrigger("FinishAttack");
+            }
+        }
+
+
+
         // 2. 오른쪽 버튼 입력 받기
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
         if (Input.GetMouseButtonDown(2))
@@ -73,45 +130,7 @@ public class PlayerFire : MonoBehaviour
 
         }
 
-        if (Input.GetMouseButtonDown(1))
-        {
-            if (BombCount == 0)
-            {
-                Debug.Log("폭탄 발사 못해");
-                BombCountText.text = BombCount + "/" + MaxBombCount;
-            }
-
-            else
-            {
-
-                _animator.SetTrigger("Attack");
-                BombCount--;
-                BombCountText.text = BombCount + "/" + MaxBombCount;
-                // 3. 발사 위치에 수류탄 생성하기
-
-                GameObject bomb = BombPoolManager.Instance.GetBomb();
-                bomb.transform.position = FirePosition.transform.position;
-                bomb.transform.position = FirePosition.transform.position;
-                bomb.transform.rotation = FirePosition.transform.rotation;
-
-                Collider bombCol = bomb.GetComponent<Collider>();
-                Collider playerCol = GetComponent<Collider>();
-                if(bombCol != null && playerCol != null)
-                {
-                    Physics.IgnoreCollision(bombCol, playerCol);
-                }
-
-                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-                Rigidbody bombRb = bomb.GetComponent<Rigidbody>();
-                bombRb.angularVelocity = Vector3.zero;
-
-                bombRb.AddForce(ray.direction * ThrowPower, ForceMode.Impulse);
-                bombRb.AddTorque(Vector3.one);
-                _animator.SetTrigger("FinishAttack");
-
-            }
-        }
-
+        
 
           
 

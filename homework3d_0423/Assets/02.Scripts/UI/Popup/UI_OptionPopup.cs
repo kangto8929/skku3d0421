@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class UI_OptionPopup : UI_Popup
 {
+
+
     public void OnClickContinueButton()
     {
         GameManager.Instance.Continue();

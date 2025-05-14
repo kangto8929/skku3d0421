@@ -148,7 +148,7 @@ public class PlayerMove : MonoBehaviour
         {
             JumpCount = 0;
             _yVelocity = -2f;
-            Debug.Log("착지함");
+           // Debug.Log("착지함");
 
             AnimatorStateInfo animationInfo = Animator.GetCurrentAnimatorStateInfo(0);
             if (animationInfo.IsName("JumpAir"))

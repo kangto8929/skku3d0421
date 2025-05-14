@@ -19,6 +19,8 @@ public class PopupManager : MonoBehaviour
 
     private List<UI_Popup> _openedPopups = new List<UI_Popup>(); // null은 아니지만 비어있는 리스트
 
+    public GameObject GameOverPanel;
+
     private void Awake()
     {
         Instance = this;
@@ -45,9 +47,16 @@ public class PopupManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && UIReadyGo.ReadyGoPanel.activeSelf == false)
+        if (Input.GetKeyDown(KeyCode.Escape) 
+            && UIReadyGo.ReadyGoPanel.activeSelf == false && GameOverPanel.activeSelf == false)
         {
             ClosePopUp();
+        }
+
+        else if(Input.GetMouseButtonDown(0) && GameOverPanel.activeSelf == true)
+        {
+            GameOverPanel.SetActive(false);
+            GameManager.Instance.Restart();
         }
     }
 
